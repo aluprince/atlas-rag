@@ -1,0 +1,3 @@
+Atlas RAG is an enterprise knowledge assistant.
+
+Employees can use Atlas to search internal company documentation and ask questions about company policies, engineering procedures, and other internal knowledge.

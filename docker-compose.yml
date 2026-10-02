@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: atlas-rag-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: atlas_rag
+      POSTGRES_USER: atlas
+      POSTGRES_PASSWORD: atlas_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+  
