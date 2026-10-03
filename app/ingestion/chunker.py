@@ -38,6 +38,43 @@ def chunk_document(
         current_chunk = ""
 
         for paragraph in paragraphs:
+            # If the paragraph itself is larger than the chunk size,
+            # flush the current chunk first, then split the paragraph.
+            if len(paragraph) > chunk_size:
+                if current_chunk:
+                    chunks.append(
+                        DocumentChunk(
+                            content=current_chunk,
+                            chunk_index=chunk_index,
+                            page_number=page.page_number,
+                        )
+                    )
+                    chunk_index += 1
+
+                    current_chunk = _get_overlap(
+                        current_chunk,
+                        chunk_overlap,
+                    )
+
+                split_chunks = _split_text(
+                    paragraph,
+                    chunk_size,
+                    chunk_overlap,
+                )
+
+                for split_chunk in split_chunks[:-1]:
+                    chunks.append(
+                        DocumentChunk(
+                            content=split_chunk,
+                            chunk_index=chunk_index,
+                            page_number=page.page_number,
+                        )
+                    )
+                    chunk_index += 1
+
+                current_chunk = split_chunks[-1]
+                continue
+
             if not current_chunk:
                 current_chunk = paragraph
                 continue
@@ -69,45 +106,24 @@ def chunk_document(
                 else paragraph
             )
 
-            while len(current_chunk) > chunk_size:
-                split_point = _find_split_point(
-                    current_chunk,
-                    chunk_size,
-                )
+        if current_chunk:
+            # current_chunk should never exceed chunk_size here,
+            # but this keeps the invariant explicit.
+            split_chunks = _split_text(
+                current_chunk,
+                chunk_size,
+                chunk_overlap,
+            )
 
+            for split_chunk in split_chunks:
                 chunks.append(
                     DocumentChunk(
-                        content=current_chunk[:split_point].strip(),
+                        content=split_chunk,
                         chunk_index=chunk_index,
                         page_number=page.page_number,
                     )
                 )
-
                 chunk_index += 1
-
-                overlap = _get_overlap(
-                    current_chunk[:split_point],
-                    chunk_overlap,
-                )
-
-                remaining = current_chunk[split_point:].strip()
-
-                current_chunk = (
-                    f"{overlap} {remaining}"
-                    if overlap
-                    else remaining
-                )
-
-        if current_chunk:
-            chunks.append(
-                DocumentChunk(
-                    content=current_chunk,
-                    chunk_index=chunk_index,
-                    page_number=page.page_number,
-                )
-            )
-
-            chunk_index += 1
 
     return chunks
 
@@ -121,11 +137,52 @@ def _split_paragraphs(text: str) -> list[str]:
     ]
 
 
+def _split_text(
+    text: str,
+    chunk_size: int,
+    chunk_overlap: int,
+) -> list[str]:
+    """
+    Split oversized text into word-aware chunks with overlap.
+    """
+    chunks: list[str] = []
+    remaining = text.strip()
+
+    while len(remaining) > chunk_size:
+        split_point = _find_split_point(
+            remaining,
+            chunk_size,
+        )
+
+        chunk = remaining[:split_point].strip()
+
+        if chunk:
+            chunks.append(chunk)
+
+        overlap = _get_overlap(
+            chunk,
+            chunk_overlap,
+        )
+
+        remaining_text = remaining[split_point:].strip()
+
+        remaining = (
+            f"{overlap} {remaining_text}"
+            if overlap
+            else remaining_text
+        )
+
+    if remaining:
+        chunks.append(remaining)
+
+    return chunks
+
+
 def _find_split_point(text: str, max_length: int) -> int:
     """
     Find a natural split point at or before max_length.
 
-    Prefer whitespace so we don't split words in half.
+    Prefer whitespace so words are not split in half.
     """
     if len(text) <= max_length:
         return len(text)
