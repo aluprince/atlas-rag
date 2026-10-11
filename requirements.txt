@@ -1,0 +1,26 @@
+# Web Framework & ASGI Server
+fastapi>=0.100.0
+uvicorn[standard]>=0.22.0
+
+# Environment & Configuration
+python-dotenv>=1.0.0
+pydantic>=2.0.0
+
+# HTTP & Networking
+requests>=2.31.0
+httpx>=0.24.0
+
+# RAG, Embeddings & AI Frameworks
+langchain>=0.1.0
+sentence-transformers>=2.2.2
+fastembed>=0.2.0
+google-generativeai>=0.3.0
+openai>=1.0.0
+
+# Vector Stores & Databases
+chromadb>=0.4.0
+
+# Document Processing & Parsing
+pypdf>=3.0.0
+beautifulsoup4>=4.12.0
+networkx>=3.1
