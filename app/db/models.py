@@ -2,6 +2,8 @@ from datetime import datetime
 
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from pgvector.sqlalchemy import Vector
+
 
 
 class Base(DeclarativeBase):
@@ -64,6 +66,11 @@ class DocumentChunk(Base):
     page_number: Mapped[int | None] = mapped_column(
         Integer,
         nullable=True,
+    )
+
+    embedding: Mapped[list[float] | None] = mapped_column(
+    Vector(384),
+    nullable=True,
     )
 
     document: Mapped["Document"] = relationship(

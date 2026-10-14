@@ -214,3 +214,5 @@ def _get_overlap(text: str, overlap_size: int) -> str:
         start += 1
 
     return text[start:].strip()
+
+

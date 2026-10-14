@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     database_url: str = (
-        "postgresql+psycopg://atlas:atlas_dev_password@localhost:5432/atlas_rag"
+        "postgresql+psycopg://atlas:atlas_dev_password@localhost:5433/atlas_rag"
     )
 
     model_config = SettingsConfigDict(
