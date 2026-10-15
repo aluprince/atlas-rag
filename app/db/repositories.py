@@ -106,3 +106,42 @@ def search_similar_chunks(
     )
 
     return list(db.scalars(statement).all())
+
+
+
+def search_similar_chunks_with_scores(
+    db: Session,
+    query_embedding: list[float],
+    limit: int = 5,
+    document_id: int | None = None,
+) -> list[tuple[DocumentChunk, float]]:
+    """Return matching chunks with cosine similarity scores."""
+    if len(query_embedding) != 384:
+        raise ValueError("Query embedding must contain 384 dimensions.")
+
+    if limit < 1 or limit > 20:
+        raise ValueError("Search limit must be between 1 and 20.")
+
+    distance = DocumentChunk.embedding.cosine_distance(
+        query_embedding
+    ).label("distance")
+
+    statement = (
+        select(DocumentChunk, distance)
+        .options(selectinload(DocumentChunk.document))
+        .where(DocumentChunk.embedding.is_not(None))
+    )
+
+    if document_id is not None:
+        statement = statement.where(
+            DocumentChunk.document_id == document_id
+        )
+
+    statement = statement.order_by(distance).limit(limit)
+
+    rows = db.execute(statement).all()
+
+    return [
+        (chunk, 1.0 - float(cosine_distance))
+        for chunk, cosine_distance in rows
+    ]

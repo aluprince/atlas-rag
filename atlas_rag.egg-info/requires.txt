@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+psycopg[binary]
+pgvector
+pydantic-settings
+pymupdf
+python-docx
+sentence-transformers
+python-multipart
+
+[dev]
+pytest
+httpx
