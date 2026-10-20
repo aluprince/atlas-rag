@@ -29,3 +29,5 @@ SQLAlchemy>=2.0.0
 psycopg[binary]>=3.1.0
 pgvector>=0.2.0
 python-multipart>=0.0.9
+PyMuPDF
+pydantic-settings
