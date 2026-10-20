@@ -19,6 +19,8 @@ dependencies = [
     "sentence-transformers",
     "python-multipart",
     "groq",
+    "streamlit",
+    "requests",
 ]
 
 [project.optional-dependencies]

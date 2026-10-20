@@ -95,22 +95,30 @@ def chat(
 
     context = "\n\n---\n\n".join(context_parts)
 
+    
     try:
         answer = generate_answer(
             question=request.question,
             context=context,
         )
     except LLMConfigurationError as exc:
+        logger.error("LLM configuration error: %s", exc)
         raise HTTPException(
             status_code=503,
-            detail=str(exc),
+            detail="The language model is not configured correctly.",
         ) from exc
     except LLMProviderError as exc:
+        logger.error("LLM provider request failed: %s", exc)
         raise HTTPException(
             status_code=502,
-            detail=str(exc),
+            detail="The language model request failed.",
         ) from exc
-
+    except Exception:
+        logger.exception("Unexpected error while generating chat answer")
+        raise HTTPException(
+            status_code=502,
+            detail="The language model request failed.",
+        )
     return {
         "question": request.question,
         "answer": answer,
