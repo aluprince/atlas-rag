@@ -13,5 +13,4 @@ COPY . .
 
 EXPOSE 10000
 
-CMD ["python", "-u", "-c", "import os, time; print('CONTAINER STARTED', flush=True); print('PORT=', os.getenv('PORT', 'NOT SET'), flush=True); time.sleep(600)"]
-#CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-10000}"]
+CMD ["sh", "-c", "echo 'Starting Atlas-RAG...' && python -u -c \"import app.main; print('APP IMPORT SUCCESSFUL', flush=True)\" && exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-10000} --log-level debug"]
