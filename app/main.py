@@ -1,16 +1,11 @@
 
 from fastapi import FastAPI
+from app.api.documents import router as documents_router
 
-app = FastAPI(
-    title="Atlas RAG",
-    description="Startup diagnostic",
-    version="0.1.0",
-)
+app = FastAPI(title="Atlas-RAG")
 
+app.include_router(documents_router)
 
 @app.get("/health")
-def health_check():
-    return {
-        "status": "healthy",
-        "service": "atlas-rag",
-    }
+def health():
+    return {"status": "ok"}
